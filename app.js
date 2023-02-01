@@ -2,13 +2,16 @@ import express from 'express';
 import mongoose from 'mongoose'
 import morgan from 'morgan'
 import bodyParser from "body-parser";
+import dotenv from 'dotenv';
 
+dotenv.config()
 // creating my express server
 const app = express();
 const PORT = 7777;
 
 // using morgan for logs
 app.use(morgan('combined'));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // create a schema for the devices collection
@@ -24,14 +27,24 @@ const Device = mongoose.model('Device', DeviceSchema);
 mongoose.Promise = global.Promise;
 mongoose.set("strictQuery", false);
 
-mongoose.connect('mongodb://0.0.0.0:27017/test-db-devices-noroff', {
+console.log(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
     console.log("We're connected to the database <3 <3 !");
+});
+
+app.get('/', (req, res) => {
+    res.send("Hello i am running<3")
+});
+
+app.get('*', (req, res) => {
+    res.send("Hello i am running<3")
 });
 
 // create a new device
